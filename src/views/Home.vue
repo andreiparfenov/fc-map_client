@@ -16,7 +16,8 @@
       <ymap-marker
         v-for="marker in sortedPlaces"
         :markerId="marker._id" 
-        :key="marker._id" 
+        :key="marker._id"
+        :hint-content="marker.title" 
         :coords="marker.coords" 
         :balloon-template="balloonTemplate(marker)"
         :icon="marker.type === 'Общепит' ? eatIcon : marker.type === 'Торговля' ? shopIcon : funIcon"
@@ -62,6 +63,7 @@ export default {
       return `
         <h2>${marker.title}</h2>
         <p>${marker.desc}</p>
+        <p><b>Координаты:</b> ${marker.coords[0]}, ${marker.coords[1]}</p>
       `
     },
     async getPlaces() {
