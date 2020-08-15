@@ -1,13 +1,20 @@
 <template>
   <div class="home">
+    <div class="home-nav">
+      <p :class="{ active: placesType === 'all' }" @click="placesType = 'all'">Все места</p>
+      <p :class="{ active: placesType === 'Общепит' }" @click="placesType = 'Общепит'">Общепит</p>
+      <p :class="{ active: placesType === 'Торговля' }" @click="placesType = 'Торговля'">Торговля</p>
+      <p :class="{ active: placesType === 'Развлечения' }" @click="placesType = 'Развлечения'">Развлечения</p>
+    </div>
     <yandex-map
       class="home-map"
       :coords="coords"
       :zoom="zoom"
       :controls="controls"
+      @click="onClick"
     >
       <ymap-marker
-        v-for="marker in places"
+        v-for="marker in sortedPlaces"
         :markerId="marker._id" 
         :key="marker._id" 
         :coords="marker.coords" 
@@ -32,6 +39,7 @@ export default {
       zoom: 15,
       controls: ["zoomControl"],
       places: [],
+      placesType: 'all',
       eatIcon: {
         layout: 'default#image',
         imageHref: require('../assets/eat-icon.png'),
@@ -60,10 +68,22 @@ export default {
       const response = await PlacesService.fetchPlaces();
       this.places = response.data;
       console.log(this.places);
+    },
+    onClick(e) {
+      this.$router.push({ name: 'AddNewPlace', params: { coordinates: e.get('coords') } });
     }
   },
   mounted() {
     this.getPlaces();
+  },
+  computed: {
+    sortedPlaces: function() {
+      if (this.placesType === 'all') {
+        return this.places
+      } else {
+        return this.places.filter((place) => { return place.type === this.placesType })
+      }
+    }
   }
 }
 </script>
@@ -75,6 +95,31 @@ export default {
   width: 100vw;
   position: relative;
   z-index: 0;
+
+  &-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background: #FFFFFF;
+    height: 70px;
+    display: flex;
+    align-items: center;
+
+    p {
+      margin: 20px;
+      text-decoration: underline;
+
+      &:hover {
+        cursor: pointer;
+        color: green;
+      }
+
+      &.active {
+        color: green;
+      }
+    }
+  }
 
   &-map {
     height: 100%;
